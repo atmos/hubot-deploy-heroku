@@ -1,0 +1,46 @@
+{
+  "name": "hubot-deploy-heroku",
+  "version": "0.0.1",
+  "author": "Corey Donohoe <atmos@atmos.org>",
+  "description": "Helpers to deploy to heroku with hubot-deploy",
+  "main": "index.coffee",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atmos/hubot-deploy-heroku"
+  },
+  "keywords": [
+    "flow",
+    "github",
+    "deploy",
+    "heroku",
+    "hubot-deploy",
+    "hubot",
+    "chatops",
+    "deployment"
+  ],
+  "homepage": "https://github.com/atmos/hubot-deploy-heroku",
+  "scripts": {
+    "test": "cake test"
+  },
+  "contributors": [
+    {
+      "name": "Corey Donohoe",
+      "email": "atmos@atmos.org"
+    }
+  ],
+  "dependencies": {
+    "scoped-http-client": "0.11.0"
+  },
+  "devDependencies": {
+    "chai":          "~1.0.3",
+    "mocha":         "~2.2.5",
+    "coffee-script": ">=1.6.3"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "bugs": {
+    "url": "https://github.com/atmos/hubot-deploy-heroku/issues"
+  },
+  "license": "MIT"
+}
