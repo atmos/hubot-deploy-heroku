@@ -76,5 +76,5 @@ class Reaper
 exports.Reaper        = Reaper
 exports.BuildInfo     = BuildInfo
 exports.TokenVerifier = TokenVerifier
-
+exports.Deployment    = require("./src/deployment").Deployment
 ###########################################################################

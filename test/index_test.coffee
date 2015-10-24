@@ -5,7 +5,9 @@ pkgVersion = pkg.version
 
 HubotDeployHeroku = require Path.join __dirname, "..", "index"
 
+Reaper        = HubotDeployHeroku.Reaper
 BuildInfo     = HubotDeployHeroku.BuildInfo
+Deployment    = HubotDeployHeroku.Deployment
 TokenVerifier = HubotDeployHeroku.TokenVerifier
 
 describe "The hubot-deploy-heroku", () ->
@@ -20,3 +22,10 @@ describe "The hubot-deploy-heroku", () ->
   it "knows about token verification", () ->
     verifier = new TokenVerifier "token"
     assert.equal "token", verifier.apiToken
+
+  it "knows about the reaper", () ->
+    reaper = new Reaper "token", "status"
+    assert.equal "token", reaper.info
+    assert.equal "status", reaper.status
+
+  it "knows about deployments"
