@@ -1,6 +1,6 @@
 {
   "name": "hubot-deploy-heroku",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "Corey Donohoe <atmos@atmos.org>",
   "description": "Helpers to deploy to heroku with hubot-deploy",
   "main": "index.coffee",
