@@ -19,7 +19,7 @@ class TokenVerifier
     @apiToken = token.trim()
 
   valid: (cb) ->
-    ScopedClient.http("https://api.heroku.com").
+    ScopedClient.create("https://api.heroku.com").
       header("Accept", "application/vnd.heroku+json; version=3").
       header("Authorization", "Bearer #{@apiToken}").
       path("/account").
