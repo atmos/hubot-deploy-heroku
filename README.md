@@ -1,4 +1,4 @@
-# hubot-deploy-herork [![Build Status](https://travis-ci.org/atmos/hubot-deploy-heroku.png?branch=master)](https://travis-ci.org/atmos/hubot-deploy-heroku)
+# hubot-deploy-heroku [![Build Status](https://travis-ci.org/atmos/hubot-deploy-heroku.png?branch=master)](https://travis-ci.org/atmos/hubot-deploy-heroku)
 
 [GitHub Flow][1] via [GitHub deployments][2], [hubot][3] and [heroku][6].
 
