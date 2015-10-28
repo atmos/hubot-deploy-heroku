@@ -29,6 +29,7 @@
     }
   ],
   "dependencies": {
+    "hubot-vault": "0.0.1",
     "hubot-deploy": "0.9.7",
     "scoped-http-client": "0.11.0"
   },

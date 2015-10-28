@@ -15,7 +15,7 @@ class BuildInfo
 
 class TokenVerifier
   constructor: (token) ->
-    @apiToken = token.trim()
+    @apiToken = token?.trim()
 
   valid: (cb) ->
     ScopedClient.create("https://api.heroku.com").

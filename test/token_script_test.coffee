@@ -11,6 +11,9 @@ describe "Setting tokens and such", () ->
     robot = new Robot(null, "mock-adapter", true, "Hubot")
 
     robot.adapter.on "connected", () ->
+      require("hubot-deploy")(robot)
+      require("hubot-vault")(robot)
+      require("hubot-help")(robot)
       require("../index")(robot)
 
       userInfo =
@@ -28,10 +31,31 @@ describe "Setting tokens and such", () ->
     robot.server.close()
     robot.shutdown()
 
-  it "sets your http token", (done) ->
+  it "displays help", (done) ->
     adapter.on "reply", (envelope, strings) ->
-      console.log strings[0]
       expect(strings[0]).match(/Why hello there/)
       done()
 
-    adapter.receive(new TextMessage(user, "deploy-token:set:heroku 123456789"))
+    adapter.receive(new TextMessage(user, "Hubot help deploy"))
+
+  it "tells you when your provided http token is invalid", (done) ->
+    adapter.on "send", (envelope, strings) ->
+      assert.match strings[0], /Sorry, your heroku token is invalid/
+      done()
+    adapter.receive(new TextMessage(user, "Hubot deploy-token:set:heroku 123456789"))
+  it "tells you when your provided heroku token is valid", (done) ->
+    adapter.on "send", (envelope, strings) ->
+      assert.match strings[0], /Sorry, your heroku token is invalid/
+      done()
+    adapter.receive(new TextMessage(user, "Hubot deploy-token:set:heroku 123456789"))
+
+  it "tells you when your stored heroku token is valid", (done) ->
+    adapter.on "send", (envelope, strings) ->
+      assert.match strings[0], /Sorry, your heroku token is invalid\. I removed it from memory/
+      done()
+    adapter.receive(new TextMessage(user, "Hubot deploy-token:verify:heroku"))
+  it "tells you when your stored heroku token is valid", (done) ->
+    adapter.on "send", (envelope, strings) ->
+      assert.match strings[0], /Hey, atmos@atmos.org\. Your heroku token is valid\./
+      done()
+    adapter.receive(new TextMessage(user, "Hubot deploy-token:verify:heroku"))

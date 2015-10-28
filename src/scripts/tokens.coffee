@@ -6,7 +6,8 @@
 #
 tokenKey = "hubot-deploy-heroku-secret"
 
-HerokuHelpers = require "./../helpers"
+Crypto  = require "crypto"
+Helpers = require "./../helpers"
 
 module.exports = (robot) ->
   robot.respond /deploy-token:set:heroku (.*)/i, (msg) ->
@@ -16,7 +17,7 @@ module.exports = (robot) ->
     unless user?.id.match(/\d+/)
       msg.send "Yo, in the future you can private message to talk about heroku keys."
 
-    verifier = new HerokuHelpers.TokenVerifier(token)
+    verifier = new Helpers.TokenVerifier(token)
     verifier.valid (result) ->
       if result
         vault = robot.vault.forUser(user)
@@ -32,10 +33,12 @@ module.exports = (robot) ->
 
     vault = robot.vault.forUser(user)
     token = vault.get tokenKey
-    hashedToken = Crypto.createHash("sha1").update(token).digest("hex")
-    robot.logger.info "#{user.id}-#{user.name} heroku token hash: #{hashedToken}."
 
-    verifier = new HerokuHelpers.TokenVerifier(token)
+    if token?
+      hashedToken = Crypto.createHash("sha1").update(token).digest("hex")
+      robot.logger.info "#{user.id}-#{user.name} heroku token hash: #{hashedToken}."
+
+    verifier = new Helpers.TokenVerifier(token)
     verifier.valid (result) ->
       if result
         msg.send "Hey #{result.email}. Your heroku token is valid."
@@ -50,7 +53,8 @@ module.exports = (robot) ->
 
     vault = robot.vault.forUser(user)
     token = vault.get tokenKey
-    hashedToken = Crypto.createHash("sha1").update(token).digest("hex")
-    robot.logger.info "Unsetting #{user.id}-#{user.name} heroku token hash: #{hashedToken}."
+    if token?
+      hashedToken = Crypto.createHash("sha1").update(token).digest("hex")
+      robot.logger.info "Unsetting #{user.id}-#{user.name} heroku token hash: #{hashedToken}."
     vault.unset tokenKey
     msg.send "Yo, I nuked your heroku token. You won't be able to deploy until you add a new one."
