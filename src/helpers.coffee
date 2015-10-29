@@ -33,6 +33,7 @@ class TokenVerifier
 
 class Reaper
   constructor: (@info, @status, @logger) ->
+    @maxTries = 18
     @sleepFor = 10
 
   log: (string) ->
@@ -44,7 +45,7 @@ class Reaper
     self =   @
     info =   @info
     status = @status
-    maxTries = 18
+    maxTries = @maxTries
 
     pollForCompletion = ( ) ->
       maxTries -= 1
@@ -66,7 +67,7 @@ class Reaper
                 status.state = "failure"
             status.create (err, res, body) ->
               callback(err, res, body, self)
-              log "Polling Heroku Build: #{info.appName}:#{info.id}:#{status.state}"
+          log "Polling Heroku Build: #{info.appName}:#{info.id}:#{status.state}"
         catch err
           log "Error in pollForCompletion on heroku: #{err}"
 

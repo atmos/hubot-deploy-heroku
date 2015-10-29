@@ -31,7 +31,7 @@ module.exports.cassettes =
         id: 1
         login: "octocat"
         avatar_url: "https://github.com/images/error/octocat_happy.gif"
-      description: "Deployment finished successfully.",
+      description: "Deployment failed to complete.",
       target_url: "https://example.com/deployment/42/output",
       created_at: "2012-07-20T01:19:13Z",
       updated_at: "2012-07-20T01:19:13Z",
