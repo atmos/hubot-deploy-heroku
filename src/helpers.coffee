@@ -33,17 +33,19 @@ class TokenVerifier
 
 class Reaper
   constructor: (@info, @status, @logger) ->
+    @maxTries = 18
     @sleepFor = 10
 
   log: (string) ->
     if @logger?
       @logger.info string
 
-  watch: () ->
+  watch: (callback) ->
     log  =   @log
+    self =   @
     info =   @info
     status = @status
-    maxTries = 18
+    maxTries = @maxTries
 
     pollForCompletion = ( ) ->
       maxTries -= 1
@@ -52,10 +54,11 @@ class Reaper
         try
           if err
             log "Error polling in heroku: #{err}"
+            return callback(err, res, body, self)
 
           data = JSON.parse(body)
           if maxTries > 0 and data['status'] is "pending"
-            setTimeout(pollForCompletion, 10000)
+            setTimeout(pollForCompletion, process.env.REAPER_TIMEOUT || 10000)
           else
             switch data["status"]
               when "succeeded"
@@ -63,14 +66,15 @@ class Reaper
               else
                 status.state = "failure"
             status.create (err, res, body) ->
-              log "Polling Heroku Build: #{info.appName}:#{info.id}:#{status.state}"
+              callback(err, res, body, self)
+          log "Polling Heroku Build: #{info.appName}:#{info.id}:#{status.state}"
         catch err
           log "Error in pollForCompletion on heroku: #{err}"
 
     info.status (err, res, body) =>
       status.state = "pending"
       status.create (err, res, body) =>
-        setTimeout pollForCompletion
+        setTimeout pollForCompletion, 0
 
 exports.Reaper        = Reaper
 exports.BuildInfo     = BuildInfo
