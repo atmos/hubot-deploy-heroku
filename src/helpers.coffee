@@ -74,6 +74,7 @@ class Reaper
 
 exports.Reaper        = Reaper
 exports.BuildInfo     = BuildInfo
+exports.TokenKey      = "hubot-deploy-heroku-secret"
 exports.TokenVerifier = TokenVerifier
 exports.Deployment    = require("./deployment").Deployment
 ###########################################################################

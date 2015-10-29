@@ -1,10 +1,12 @@
 # Description
-#   Enable deployment statuses from the GitHub API
+#   Enable deploying GitHub repos to Heroku Apps
 #
 # Commands:
-#   hubot deploy-hooks:sync - Sets your user's deployment token. Requires repo_deployment scope.
 #
-tokenKey = "hubot-deploy-heroku-secret"
+#   hubot deploy-token:set:heroku <token> - Sets your user's Heroku API token.
+#   hubot deploy-token:reset:heroku - Resets your user's Heroku API token.
+#   hubot deploy-token:verify:heroku - Verifies that your Heroku API token is valid.
+#
 
 Crypto  = require "crypto"
 Helpers = require "./../helpers"
@@ -21,7 +23,7 @@ module.exports = (robot) ->
     verifier.valid (result) ->
       if result
         vault = robot.vault.forUser(user)
-        vault.set tokenKey, token
+        vault.set Helpers.TokenKey, token
         msg.send "Hey, #{result.email}. Your heroku token is valid. I stored it for future use."
       else
         msg.send "Sorry, your heroku token is invalid."
@@ -32,7 +34,7 @@ module.exports = (robot) ->
       return msg.send "Sorry, can you private message me to talk about heroku keys?"
 
     vault = robot.vault.forUser(user)
-    token = vault.get tokenKey
+    token = vault.get Helpers.TokenKey
 
     if token?
       hashedToken = Crypto.createHash("sha1").update(token).digest("hex")
@@ -43,7 +45,7 @@ module.exports = (robot) ->
       if result
         msg.send "Hey, #{result.email}. Your heroku token is still valid."
       else
-        vault.unset tokenKey
+        vault.unset Helpers.TokenKey
         msg.send "Sorry, your heroku token is invalid. I removed it from memory."
 
   robot.respond /deploy-token:reset:heroku/i, (msg) ->
@@ -52,9 +54,9 @@ module.exports = (robot) ->
       return msg.send "Sorry, can you private message me to talk about keys?"
 
     vault = robot.vault.forUser(user)
-    token = vault.get tokenKey
+    token = vault.get Helpers.TokenKey
     if token?
       hashedToken = Crypto.createHash("sha1").update(token).digest("hex")
       robot.logger.info "Unsetting #{user.id}-#{user.name} heroku token hash: #{hashedToken}."
-    vault.unset tokenKey
+    vault.unset Helpers.TokenKey
     msg.send "Yo, I nuked your heroku token. You won't be able to deploy until you add a new one."
