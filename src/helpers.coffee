@@ -15,12 +15,12 @@ class BuildInfo
 
 class TokenVerifier
   constructor: (token) ->
-    @apiToken = token?.trim()
+    @token = token?.trim()
 
   valid: (cb) ->
     ScopedClient.create("https://api.heroku.com").
       header("Accept", "application/vnd.heroku+json; version=3").
-      header("Authorization", "Bearer #{@apiToken}").
+      header("Authorization", "Bearer #{@token}").
       path("/account").
       get() (err, res, body) ->
         if err
