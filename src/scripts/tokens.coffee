@@ -16,14 +16,14 @@ module.exports = (robot) ->
     token = msg.match[1]
 
     user  = robot.brain.userForId msg.envelope.user.id
-    unless user?.id?.match(/\d+/)
+    unless user?.id?.toString().match(/\d+/)
       msg.send "Yo, in the future you can private message to talk about heroku keys."
 
     verifier = new Helpers.TokenVerifier(token)
     verifier.valid (result) ->
       if result
         vault = robot.vault.forUser(user)
-        vault.set Helpers.TokenKey, token
+        vault.set Helpers.TokenKey, verifier.token
         delete(user.herokuDeployToken) # Clean up older unencrypted user attrs
         msg.send "Hey, #{result.email}. Your heroku token is valid. I stored it for future use."
       else
@@ -31,7 +31,7 @@ module.exports = (robot) ->
 
   robot.respond /deploy-token:verify:heroku$/i, (msg) ->
     user  = robot.brain.userForId msg.envelope.user.id
-    unless user?.id?.match(/\d+/)
+    unless user?.id?.toString().match(/\d+/)
       return msg.send "Sorry, can you private message me to talk about heroku keys?"
 
     vault = robot.vault.forUser(user)
@@ -52,7 +52,7 @@ module.exports = (robot) ->
 
   robot.respond /deploy-token:reset:heroku/i, (msg) ->
     user = robot.brain.userForId msg.envelope.user.id
-    unless user?.id?.match(/\d+/)
+    unless user?.id?.toString().match(/\d+/)
       return msg.send "Sorry, can you private message me to talk about keys?"
 
     vault = robot.vault.forUser(user)
