@@ -13,7 +13,7 @@
 ## See Also
 
 * [hubot](https://github.com/github/hubot) - A chat robot with support for a lot of networks.
-* [hubot-deploy](https://github.com/github/hubot-deploy) - A hubot script to trigger deployments.
+* [hubot-deploy](https://github.com/atmos/hubot-deploy) - A hubot script to trigger deployments.
 * [hubot-auto-deploy](https://github.com/atmos/hubot-auto-deploy) - Manage automated deployments on GitHub from chat.
 
 [1]: https://guides.github.com/overviews/flow/
