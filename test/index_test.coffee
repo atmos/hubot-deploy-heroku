@@ -3,7 +3,7 @@ Path   = require("path")
 pkg = require Path.join __dirname, "..", "package.json"
 pkgVersion = pkg.version
 
-HubotDeployHeroku = require Path.join __dirname, "..", "index"
+HubotDeployHeroku = require Path.join __dirname, "..", "src", "helpers"
 
 Reaper        = HubotDeployHeroku.Reaper
 BuildInfo     = HubotDeployHeroku.BuildInfo
