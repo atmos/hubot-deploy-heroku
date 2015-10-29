@@ -33,3 +33,20 @@ describe "The Reaper", () ->
       assert.equal "Deployment finished successfully.", responseBody.description
       assert.equal "https://example.com/deployment/42/output", responseBody.target_url
       done()
+
+  it "properly flags repos when a build is pending", (done) ->
+    VCR.play "/apps-hubot-builds-#{buildId}-pending", 2
+    VCR.play "/repos-atmos-hubot-deploy-heroku-deployments-42-statuses-pending", 2
+
+    appName = "hubot"
+    info = new HerokuHelpers.BuildInfo "token", "hubot", buildId
+    status = new GitHubDeploymentStatus "github_token", "atmos/hubot-deploy-heroku", 42
+    status.targetUrl = "https://dashboard.heroku.com/apps/#{appName}/activity/builds/#{buildId}"
+
+    reaper = new HerokuHelpers.Reaper(info, status, logger)
+    reaper.watch (err, res, body, reaper) ->
+      responseBody = JSON.parse(body)
+      assert.equal "pending", reaper.status.state
+      assert.equal "Deployment running.", responseBody.description
+      assert.equal "https://example.com/deployment/42/output", responseBody.target_url
+      done()
