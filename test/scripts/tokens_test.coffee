@@ -1,8 +1,8 @@
 Path        = require "path"
 Robot       = require "hubot/src/robot"
 TextMessage = require("hubot/src/message").TextMessage
-helpers     = require("../src/helpers")
-VCR         = require "./vcr"
+Helpers     = require("./../../src/helpers")
+VCR         = require "./../vcr"
 
 describe "Setting tokens and such", () ->
   user  = null
@@ -16,7 +16,7 @@ describe "Setting tokens and such", () ->
     robot.adapter.on "connected", () ->
       require("hubot-deploy")(robot)
       require("hubot-vault")(robot)
-      require("../index")(robot)
+      require("../../index")(robot)
 
       userInfo =
         name: "atmos",
@@ -51,7 +51,7 @@ describe "Setting tokens and such", () ->
     VCR.play "/account valid"
     expectedResponse = /Hey, username@example.com. Your heroku token is valid. I stored it for future use./
     adapter.on "send", (envelope, strings) ->
-      assert robot.vault.forUser(user).get(helpers.TokenKey), "123456789"
+      assert robot.vault.forUser(user).get(Helpers.TokenKey), "123456789"
       done()
     adapter.receive(new TextMessage(user, "Hubot deploy-token:set:heroku 123456789"))
 
