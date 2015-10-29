@@ -24,6 +24,7 @@ module.exports = (robot) ->
       if result
         vault = robot.vault.forUser(user)
         vault.set Helpers.TokenKey, token
+        delete(user.herokuDeployToken) # Clean up older unencrypted user attrs
         msg.send "Hey, #{result.email}. Your heroku token is valid. I stored it for future use."
       else
         msg.send "Sorry, your heroku token is invalid."
@@ -46,6 +47,7 @@ module.exports = (robot) ->
         msg.send "Hey, #{result.email}. Your heroku token is still valid."
       else
         vault.unset Helpers.TokenKey
+        delete(user.herokuDeployToken) # Clean up older unencrypted user attrs
         msg.send "Sorry, your heroku token is invalid. I removed it from memory."
 
   robot.respond /deploy-token:reset:heroku/i, (msg) ->
