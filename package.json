@@ -34,6 +34,7 @@
     "scoped-http-client": "0.11.0"
   },
   "devDependencies": {
+    "log": "1.4.0",
     "chai": "~1.0.3",
     "nock": "2.16.0",
     "mocha": "~2.2.5",

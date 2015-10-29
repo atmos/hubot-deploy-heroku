@@ -39,8 +39,9 @@ class Reaper
     if @logger?
       @logger.info string
 
-  watch: () ->
+  watch: (callback) ->
     log  =   @log
+    self =   @
     info =   @info
     status = @status
     maxTries = 18
@@ -52,10 +53,11 @@ class Reaper
         try
           if err
             log "Error polling in heroku: #{err}"
+            return callback(err, res, body, self)
 
           data = JSON.parse(body)
           if maxTries > 0 and data['status'] is "pending"
-            setTimeout(pollForCompletion, 10000)
+            setTimeout(pollForCompletion, process.env.REAPER_TIMEOUT || 10000)
           else
             switch data["status"]
               when "succeeded"
@@ -63,6 +65,7 @@ class Reaper
               else
                 status.state = "failure"
             status.create (err, res, body) ->
+              callback(err, res, body, self)
               log "Polling Heroku Build: #{info.appName}:#{info.id}:#{status.state}"
         catch err
           log "Error in pollForCompletion on heroku: #{err}"
@@ -70,7 +73,7 @@ class Reaper
     info.status (err, res, body) =>
       status.state = "pending"
       status.create (err, res, body) =>
-        setTimeout pollForCompletion
+        setTimeout pollForCompletion, 0
 
 exports.Reaper        = Reaper
 exports.BuildInfo     = BuildInfo

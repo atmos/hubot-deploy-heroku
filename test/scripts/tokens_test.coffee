@@ -1,7 +1,7 @@
 Path        = require "path"
 Robot       = require "hubot/src/robot"
 TextMessage = require("hubot/src/message").TextMessage
-VCR         = require "./vcr"
+VCR         = require "./../vcr"
 
 describe "Setting tokens and such", () ->
   user  = null
@@ -15,7 +15,7 @@ describe "Setting tokens and such", () ->
     robot.adapter.on "connected", () ->
       require("hubot-deploy")(robot)
       require("hubot-vault")(robot)
-      require("../index")(robot)
+      require("../../index")(robot)
 
       userInfo =
         name: "atmos",
