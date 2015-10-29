@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "chai": "~1.0.3",
+    "nock": "2.16.0",
     "mocha": "~2.2.5",
     "hubot": ">=2.7.2 <=2.13.2",
     "coffee-script": ">=1.6.3",

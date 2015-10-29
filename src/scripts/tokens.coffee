@@ -22,7 +22,7 @@ module.exports = (robot) ->
       if result
         vault = robot.vault.forUser(user)
         vault.set tokenKey, token
-        msg.send "Hey #{result.email}. Your heroku token is valid. I stored it for future use."
+        msg.send "Hey, #{result.email}. Your heroku token is valid. I stored it for future use."
       else
         msg.send "Sorry, your heroku token is invalid."
 
@@ -41,7 +41,7 @@ module.exports = (robot) ->
     verifier = new Helpers.TokenVerifier(token)
     verifier.valid (result) ->
       if result
-        msg.send "Hey #{result.email}. Your heroku token is valid."
+        msg.send "Hey, #{result.email}. Your heroku token is still valid."
       else
         vault.unset tokenKey
         msg.send "Sorry, your heroku token is invalid. I removed it from memory."
