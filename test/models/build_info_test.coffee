@@ -10,12 +10,13 @@ HubotDeployHeroku = require Path.join __dirname, "..", "..", "src", "helpers"
 BuildInfo     = HubotDeployHeroku.BuildInfo
 
 describe "The build information", () ->
+  info    = undefined
   buildId = "01234567-89ab-cdef-0123-456789abcdef"
   beforeEach () ->
-    #Nock.disableNetConnect()
+    info = new BuildInfo "token", "hubot", buildId
+    Nock.disableNetConnect()
 
   it "handles pending builds", (done) ->
-    info = new BuildInfo "token", "hubot", buildId
     VCR.play "/apps-hubot-builds-#{buildId}-pending"
     info.status (err, res, body) =>
       parsedBody = JSON.parse(body)
@@ -24,7 +25,6 @@ describe "The build information", () ->
       done()
 
   it "handles successful builds", (done) ->
-    info = new BuildInfo "token", "hubot", buildId
     VCR.play "/apps-hubot-builds-#{buildId}-succeeded"
     info.status (err, res, body) =>
       parsedBody = JSON.parse(body)
@@ -33,7 +33,6 @@ describe "The build information", () ->
       done()
 
   it "handles pending builds", (done) ->
-    info = new BuildInfo "token", "hubot", buildId
     VCR.play "/apps-hubot-builds-#{buildId}-failed"
     info.status (err, res, body) =>
       parsedBody = JSON.parse(body)
@@ -42,7 +41,6 @@ describe "The build information", () ->
       done()
 
   it "handles bad authenticationbuilds", (done) ->
-    info = new BuildInfo "token", "hubot", buildId
     VCR.play "/apps-hubot-builds-#{buildId}-bad-auth"
     info.status (err, res, body) =>
       parsedBody = JSON.parse(body)
