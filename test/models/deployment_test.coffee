@@ -39,3 +39,28 @@ describe "The build information", () ->
       assert.equal archiveUrl, parsedBody.source_blob.url
       assert.equal "v1.3.0", parsedBody.source_blob.version
       done()
+
+  it "creates builds with valid otp", (done) ->
+    VCR.play "/apps-hubot-builds-#{buildId}-success"
+    VCR.play "/apps-hubot-pre-authorizations-success"
+    deployment = new Deployment(production, "token", archiveUrl, logger)
+    deployment.yubikey = "ccccccdkhkgtinfvnrrhjveeertdjtdjjilclutikher"
+    deployment.run (err, res, body) ->
+      console.log err if err
+      assert.equal 200, res.statusCode
+      parsedBody = JSON.parse(body)
+      assert.equal archiveUrl, parsedBody.source_blob.url
+      assert.equal "v1.3.0", parsedBody.source_blob.version
+      done()
+
+  it "does not create builds with invalid otp", (done) ->
+    VCR.play "/apps-hubot-builds-#{buildId}-success"
+    VCR.play "/apps-hubot-pre-authorizations-failure"
+    deployment = new Deployment(production, "token", archiveUrl, logger)
+    deployment.yubikey = "ccccccdkhkgtinfvnrrhjveeertdjtdjjilclutikher"
+    deployment.run (err, res, body) ->
+      console.log err if err
+      assert.equal 401, res.statusCode
+      parsedBody = JSON.parse(body)
+      assert.equal "Invalid credentials provided.", parsedBody.message
+      done()

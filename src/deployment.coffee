@@ -40,7 +40,6 @@ class Deployment
               @log "Pre-auth: #{err}"
               callback(err, res, body)
             if res?
-              data = JSON.parse(body)
               @log "pre-auth body(#{res.statusCode}): #{body}"
               if res.statusCode is 401
                 @log "Probably a 2FA pre-authorization error, ignoring."
