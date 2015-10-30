@@ -37,12 +37,9 @@ class Deployment
         @httpRequest().path("/apps/#{@appName}/pre-authorizations").
           put() (err, res, body) =>
             if err
-              @log "Pre-auth: #{err}"
               callback(err, res, body)
-            if res?
-              @log "pre-auth body(#{res.statusCode}): #{body}"
-              if res.statusCode is 401
-                @log "Probably a 2FA pre-authorization error, ignoring."
+            if res?.statusCode is 401
+              @log "Probably a 2FA pre-authorization error, ignoring."
             callback(err, res, body)
       else
         callback(null, null, "Skipped API pre-auth, no yubikey provided.")
@@ -50,22 +47,12 @@ class Deployment
       @log "Error pre-authorizing: #{err}"
 
   build: (callback) ->
-    try
-      data = JSON.stringify(source_blob: { url: @archiveUrl, version: @version })
+    data = JSON.stringify(source_blob: { url: @archiveUrl, version: @version })
 
-      @log "Build Payload: #{data}"
-      @httpRequest().path("/apps/#{@appName}/builds").
-        post(data) (err, res, body) =>
-          if err
-            callback(err, res, body)
-          data = JSON.parse(body)
-          if res.statusCode is 401
-            @log "Build body(#{res.statusCode}): #{body}"
-            callback(new Error("#{data.id} - #{data.message}"), null, "Probably a 2FA error")
-
-          callback(err, res, body)
-    catch err
-      @log "Error creating build: #{err}"
+    @log "Build Payload: #{data}"
+    @httpRequest().path("/apps/#{@appName}/builds").
+      post(data) (err, res, body) =>
+        callback(err, res, body)
 
   run: (callback) ->
     unless @deployment.notify? and @description and @appName

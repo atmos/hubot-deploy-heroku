@@ -1,4 +1,10 @@
 module.exports.cassettes =
+  '/apps-hubot-builds-01234567-89ab-cdef-0123-456789abcdef-failure':
+    host: 'https://api.heroku.com:443'
+    path: '/apps/hubot/builds'
+    code: 401
+    method: 'post'
+    body: { }
   '/apps-hubot-builds-01234567-89ab-cdef-0123-456789abcdef-success':
     host: 'https://api.heroku.com:443'
     path: '/apps/hubot/builds'

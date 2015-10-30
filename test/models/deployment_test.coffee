@@ -64,3 +64,15 @@ describe "Deploying to heroku", () ->
       parsedBody = JSON.parse(body)
       assert.equal "Invalid credentials provided.", parsedBody.message
       done()
+
+  it "does sometimes fails with valid otp", (done) ->
+    VCR.play "/apps-hubot-builds-#{buildId}-failure"
+    VCR.play "/apps-hubot-pre-authorizations-success"
+    deployment = new Deployment(production, "token", archiveUrl, logger)
+    deployment.yubikey = "ccccccdkhkgtinfvnrrhjveeertdjtdjjilclutikher"
+    deployment.run (err, res, body) ->
+      console.log err if err
+      console.log res
+      console.log body
+      assert.equal 401, res.statusCode
+      done()
