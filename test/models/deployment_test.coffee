@@ -53,19 +53,30 @@ describe "Deploying to heroku", () ->
       assert.equal "v1.3.0", parsedBody.source_blob.version
       done()
 
-  it "does not create builds with invalid otp", (done) ->
+  it "fails to create builds with invalid otp", (done) ->
     VCR.play "/apps-hubot-builds-#{buildId}-success"
     VCR.play "/apps-hubot-pre-authorizations-failure"
     deployment = new Deployment(production, "token", archiveUrl, logger)
     deployment.yubikey = "ccccccdkhkgtinfvnrrhjveeertdjtdjjilclutikher"
     deployment.run (err, res, body) ->
       throw(err) if err
-      assert.equal 401, res.statusCode
+      assert.equal 200, res.statusCode
       parsedBody = JSON.parse(body)
-      assert.equal "Invalid credentials provided.", parsedBody.message
+      assert.equal archiveUrl, parsedBody.source_blob.url
+      assert.equal "v1.3.0", parsedBody.source_blob.version
       done()
 
-  it "does sometimes fails with valid otp", (done) ->
+  it "fails for unknown reasons", (done) ->
+    VCR.play "/apps-hubot-builds-#{buildId}-failure"
+    VCR.play "/apps-hubot-pre-authorizations-failure"
+    deployment = new Deployment(production, "token", archiveUrl, logger)
+    deployment.yubikey = "ccccccdkhkgtinfvnrrhjveeertdjtdjjilclutikher"
+    deployment.run (err, res, body) ->
+      throw(err) if err
+      assert.equal 401, res.statusCode
+      done()
+
+  it "can fail with valid otp", (done) ->
     VCR.play "/apps-hubot-builds-#{buildId}-failure"
     VCR.play "/apps-hubot-pre-authorizations-success"
     deployment = new Deployment(production, "token", archiveUrl, logger)

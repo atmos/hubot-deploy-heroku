@@ -63,11 +63,6 @@ class Deployment
       if err
         @log err
 
-      if res
-        @log "Preauth body(#{res.statusCode}): #{body}"
-        if res.statusCode isnt 200
-          callback(err, res, body)
-
       @build (err, res, body) ->
         callback(err, res, body)
 
