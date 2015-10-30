@@ -46,7 +46,7 @@ describe "Deploying to heroku", () ->
     deployment = new Deployment(production, "token", archiveUrl, logger)
     deployment.yubikey = "ccccccdkhkgtinfvnrrhjveeertdjtdjjilclutikher"
     deployment.run (err, res, body) ->
-      console.log err if err
+      throw(err) if err
       assert.equal 200, res.statusCode
       parsedBody = JSON.parse(body)
       assert.equal archiveUrl, parsedBody.source_blob.url
@@ -59,7 +59,7 @@ describe "Deploying to heroku", () ->
     deployment = new Deployment(production, "token", archiveUrl, logger)
     deployment.yubikey = "ccccccdkhkgtinfvnrrhjveeertdjtdjjilclutikher"
     deployment.run (err, res, body) ->
-      console.log err if err
+      throw(err) if err
       assert.equal 401, res.statusCode
       parsedBody = JSON.parse(body)
       assert.equal "Invalid credentials provided.", parsedBody.message
@@ -71,6 +71,6 @@ describe "Deploying to heroku", () ->
     deployment = new Deployment(production, "token", archiveUrl, logger)
     deployment.yubikey = "ccccccdkhkgtinfvnrrhjveeertdjtdjjilclutikher"
     deployment.run (err, res, body) ->
-      console.log err if err
+      throw(err) if err
       assert.equal 401, res.statusCode
       done()
