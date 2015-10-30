@@ -15,10 +15,11 @@ Deployment        = HubotDeployHeroku.Deployment
 fixtureDir = Path.join(__dirname, "..", "support", "github", "deployments")
 
 describe "The build information", () ->
-  logger     = new Log process.env.HUBOT_LOG_LEVEL or 'info'
+  logger     = undefined # new Log process.env.HUBOT_LOG_LEVEL or 'info'
   buildId    = "01234567-89ab-cdef-0123-456789abcdef"
   staging    = undefined
   production = undefined
+  archiveUrl = "https://example.com/source.tgz?token=xyz"
 
   deploymentData =
     staging:    JSON.parse(Fs.readFileSync("#{fixtureDir}/staging.json"))
@@ -30,12 +31,11 @@ describe "The build information", () ->
     staging    = new HubotDeployGitHubDeployment(buildId, deploymentData.staging)
     production = new HubotDeployGitHubDeployment(buildId, deploymentData.production)
 
-  it "handles pending builds", (done) ->
-    VCR.play "/apps-hubot-builds-#{buildId}-pending"
-    deployment = new Deployment(production, "token", "http://example.com/foo.tgz", logger)
+  it "creates builds", (done) ->
+    VCR.play "/apps-hubot-builds-#{buildId}-success"
+    deployment = new Deployment(production, "token", archiveUrl, logger)
     deployment.run (err, res, body) ->
-      console.log err
-      console.log res
-      console.log body
-      assert.equal 2, 1
+      parsedBody = JSON.parse(body)
+      assert.equal archiveUrl, parsedBody.source_blob.url
+      assert.equal "v1.3.0", parsedBody.source_blob.version
       done()

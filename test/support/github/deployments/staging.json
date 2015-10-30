@@ -23,7 +23,7 @@
           "staging"
         ],
         "allowed_rooms": [],
-        "heroku_staging_name": "zero-fucks-hubot"
+        "heroku_staging_name": "hubot"
       }
     },
     "environment": "staging",
