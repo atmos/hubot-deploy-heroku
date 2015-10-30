@@ -14,7 +14,7 @@ Deployment        = HubotDeployHeroku.Deployment
 
 fixtureDir = Path.join(__dirname, "..", "support", "github", "deployments")
 
-describe "The build information", () ->
+describe "Deploying to heroku", () ->
   logger     = undefined # new Log process.env.HUBOT_LOG_LEVEL or 'info'
   buildId    = "01234567-89ab-cdef-0123-456789abcdef"
   staging    = undefined
