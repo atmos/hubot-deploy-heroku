@@ -4,7 +4,7 @@ cassettes = { }
 
 _ = require("underscore")
 filenames = [ "heroku_account", "heroku_statuses", "github_statuses" ]
-(cassettes = _.extend(cassettes, require("./cassettes/#{filename}").cassettes) for filename in filenames)
+(cassettes = _.extend(cassettes, require("./support/cassettes/#{filename}").cassettes) for filename in filenames)
 nock.disableNetConnect()
 
 module.exports.get = (vcrName) ->
