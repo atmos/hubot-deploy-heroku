@@ -58,7 +58,6 @@ class Deployment
       @httpRequest().path("/apps/#{@appName}/builds").
         post(data) (err, res, body) =>
           if err
-            @log "Build-post: #{err}"
             callback(err, res, body)
           data = JSON.parse(body)
           if res.statusCode is 401
@@ -70,26 +69,22 @@ class Deployment
       @log "Error creating build: #{err}"
 
   run: (callback) ->
-    try
-      @log @
-      unless @deployment.notify? and @description and @appName
-        callback(null, null, null)
+    unless @deployment.notify? and @description and @appName
+      callback(null, null, null)
 
-      @log "Found heroku chat deployed request for #{@appName}"
-      @preAuthorize (err, res, body) =>
-        if err
-          @log err
+    @log "Found heroku chat deployed request for #{@appName}"
+    @preAuthorize (err, res, body) =>
+      if err
+        @log err
 
-        if res
-          @log "Preauth body(#{res.statusCode}): #{body}"
-          if res.statusCode isnt 200
-            callback(err, res, body)
-        else
-          @log "Preauth body: #{body}"
-
-        @build (err, res, body) ->
+      if res
+        @log "Preauth body(#{res.statusCode}): #{body}"
+        if res.statusCode isnt 200
           callback(err, res, body)
-    catch err
-      @log "Error running deployment: #{err}"
+      else
+        @log "Preauth body: #{body}"
+
+      @build (err, res, body) ->
+        callback(err, res, body)
 
 exports.Deployment = Deployment
