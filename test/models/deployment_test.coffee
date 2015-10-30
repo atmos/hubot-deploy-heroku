@@ -72,7 +72,5 @@ describe "Deploying to heroku", () ->
     deployment.yubikey = "ccccccdkhkgtinfvnrrhjveeertdjtdjjilclutikher"
     deployment.run (err, res, body) ->
       console.log err if err
-      console.log res
-      console.log body
       assert.equal 401, res.statusCode
       done()
