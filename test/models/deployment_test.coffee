@@ -1,9 +1,8 @@
 Fs  = require "fs"
 Log = require "log"
 
-VCR  = require "./../vcr"
+VCR  = require "vcr"
 Path = require "path"
-Nock = require "nock"
 Package = require Path.join __dirname, "..", "..", "package.json"
 Version = Package.version
 
@@ -26,10 +25,12 @@ describe "Deploying to heroku", () ->
     production: JSON.parse(Fs.readFileSync("#{fixtureDir}/production.json"))
 
   beforeEach () ->
-    Nock.disableNetConnect()
-
+    VCR.playback()
     staging    = new HubotDeployGitHubDeployment(buildId, deploymentData.staging)
     production = new HubotDeployGitHubDeployment(buildId, deploymentData.production)
+
+  afterEach () ->
+    VCR.stop()
 
   it "creates builds", (done) ->
     VCR.play "/apps-hubot-builds-#{buildId}-success"

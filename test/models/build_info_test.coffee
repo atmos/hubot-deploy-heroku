@@ -3,8 +3,7 @@ Path   = require("path")
 pkg = require Path.join __dirname, "..", "..", "package.json"
 pkgVersion = pkg.version
 
-VCR = require "./../vcr"
-Nock = require "nock"
+VCR = require("vcr")
 HubotDeployHeroku = require Path.join __dirname, "..", "..", "src", "helpers"
 
 BuildInfo     = HubotDeployHeroku.BuildInfo
@@ -13,8 +12,10 @@ describe "The build information", () ->
   info    = undefined
   buildId = "01234567-89ab-cdef-0123-456789abcdef"
   beforeEach () ->
+    VCR.playback()
     info = new BuildInfo "token", "hubot", buildId
-    Nock.disableNetConnect()
+  afterEach () ->
+    VCR.stop()
 
   it "handles pending builds", (done) ->
     VCR.play "/apps-hubot-builds-#{buildId}-pending"

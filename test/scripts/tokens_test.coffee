@@ -2,7 +2,7 @@ Path        = require "path"
 Robot       = require "hubot/src/robot"
 TextMessage = require("hubot/src/message").TextMessage
 Helpers     = require("./../../src/helpers")
-VCR         = require "./../vcr"
+VCR         = require "vcr"
 
 describe "Setting tokens and such", () ->
   user  = null
@@ -10,6 +10,7 @@ describe "Setting tokens and such", () ->
   adapter = null
 
   beforeEach (done) ->
+    VCR.playback()
     process.env.HUBOT_FERNET_SECRETS or= "HSfTG4uWzw9whtlLEmNAzscHh96eHUFt3McvoWBXmHk="
     robot = new Robot(null, "mock-adapter", true, "Hubot")
 
@@ -30,6 +31,7 @@ describe "Setting tokens and such", () ->
     robot.run()
 
   afterEach () ->
+    VCR.stop()
     robot.server.close()
     robot.shutdown()
 

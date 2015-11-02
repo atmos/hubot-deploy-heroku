@@ -4,8 +4,7 @@ Path = require "path"
 pkg = require Path.join __dirname, "..", "..", "package.json"
 pkgVersion = pkg.version
 
-VCR = require "./../vcr"
-Nock = require "nock"
+VCR = require "vcr"
 
 HerokuHelpers = require Path.join __dirname, "..", "..", "src", "helpers"
 GitHubDeploymentStatus = require("hubot-deploy/src/models/github_requests").GitHubDeploymentStatus
@@ -20,10 +19,12 @@ describe "The Reaper", () ->
 
   logger = new Log process.env.HUBOT_LOG_LEVEL or 'info'
   beforeEach () ->
-    Nock.disableNetConnect()
+    VCR.playback()
     info = new HerokuHelpers.BuildInfo "token", "hubot", buildId
     status = new GitHubDeploymentStatus "github_token", "atmos/hubot-deploy-heroku", 42
     status.targetUrl = "https://dashboard.heroku.com/apps/#{appName}/activity/builds/#{buildId}"
+  afterEach () ->
+    VCR.stop()
 
   it "properly flags repos when a build is succeeded", (done) ->
     VCR.play "/apps-hubot-builds-#{buildId}-succeeded", 2
