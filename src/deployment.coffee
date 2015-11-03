@@ -1,4 +1,9 @@
+Path         = require "path"
 ScopedClient = require "scoped-http-client"
+
+Helpers                = require Path.join __dirname, "helpers"
+Deployment             = Helpers.Deployment
+GitHubDeploymentStatus = require("hubot-deploy/src/models/github_requests").GitHubDeploymentStatus
 
 class Deployment
   constructor: (@deployment, @token, @archiveUrl, @logger) ->
@@ -52,18 +57,45 @@ class Deployment
     @log "Build Payload: #{data}"
     @httpRequest().path("/apps/#{@appName}/builds").
       post(data) (err, res, body) =>
-        callback(err, res, body)
+        callback(err, res, body, null)
+
+  postBuild: (err, res, body, callback) ->
+    data        = JSON.parse(body)
+    deployment  = @deployment.payload.deployment
+
+    ref      = deployment.ref
+    repoName = deployment.repoName
+
+    if res?.statusCode is 201
+      buildId   = data.id
+      outputUrl = data.output_stream_url
+
+      info   = new Helpers.BuildInfo herokuToken, @appName, buildId
+      status = new GitHubDeploymentStatus githubToken, repoName, deployment.number
+      status.targetUrl = "https://dashboard.heroku.com/apps/#{@appName}/activity/builds/#{buildId}"
+
+      reaper = new HerokuHelpers.Reaper(info, status, logger)
+      reaper.watch (err, res, body, reaper) ->
+        callback(err, res, body, reaper)
+    else if res?.statusCode is 403 and data.id is "two_factor"
+      callback(new Error("Unknown heroku postBuild error."), res, body, null)
+    else
+      @log JSON.stringify(res.statusCode)
+      @log JSON.stringify(body)
+      @log "Error deploying #{repoName}/#{ref} ##{deployment.number}: #{err}"
+      callback(new Error("Two Factor Failed"), res, body, null)
 
   run: (callback) ->
     unless @deployment.notify? and @description and @appName
-      callback(null, null, null)
+      callback(null, null, null, null)
 
     @log "Found heroku chat deployed request for #{@appName}"
     @preAuthorize (err, res, body) =>
       if err
         @log err
 
-      @build (err, res, body) ->
-        callback(err, res, body)
+      @build (err, res, body) =>
+        @postBuild(err, res, body) (err, res, body, reaper) ->
+          callback(err, res, body, reaper)
 
 exports.Deployment = Deployment
