@@ -4,8 +4,7 @@ Path = require "path"
 pkg = require Path.join __dirname, "..", "..", "package.json"
 pkgVersion = pkg.version
 
-VCR = require "./../vcr"
-Nock = require "nock"
+VCR = require "ys-vcr"
 
 HerokuHelpers = require Path.join __dirname, "..", "..", "src", "helpers"
 GitHubDeploymentStatus = require("hubot-deploy/src/models/github_requests").GitHubDeploymentStatus
@@ -20,10 +19,12 @@ describe "The Reaper", () ->
 
   logger = new Log process.env.HUBOT_LOG_LEVEL or 'info'
   beforeEach () ->
-    Nock.disableNetConnect()
+    VCR.playback()
     info = new HerokuHelpers.BuildInfo "token", "hubot", buildId
     status = new GitHubDeploymentStatus "github_token", "atmos/my-robot", 1875476
     status.targetUrl = "https://dashboard.heroku.com/apps/#{appName}/activity/builds/#{buildId}"
+  afterEach () ->
+    VCR.stop()
 
   it "properly flags repos when a build is succeeded", (done) ->
     VCR.play "/apps-hubot-builds-#{buildId}-succeeded", 2
@@ -31,6 +32,7 @@ describe "The Reaper", () ->
 
     reaper = new HerokuHelpers.Reaper(info, status, logger)
     reaper.watch (err, res, body, reaper) ->
+      throw err if err
       responseBody = JSON.parse(body)
       assert.equal "success", reaper.status.state
       assert.equal "Deployment finished successfully.", responseBody.description
@@ -43,6 +45,7 @@ describe "The Reaper", () ->
 
     reaper = new HerokuHelpers.Reaper(info, status, logger)
     reaper.watch (err, res, body, reaper) ->
+      throw err if err
       responseBody = JSON.parse(body)
       assert.equal "failure", reaper.status.state
       assert.equal "Deployment failed to complete.", responseBody.description
@@ -56,6 +59,7 @@ describe "The Reaper", () ->
     reaper = new HerokuHelpers.Reaper(info, status, logger)
     reaper.maxTries = 2
     reaper.watch (err, res, body, reaper) ->
+      throw err if err
       responseBody = JSON.parse(body)
       assert.equal "failure", reaper.status.state
       assert.equal "Deployment running.", responseBody.description

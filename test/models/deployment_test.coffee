@@ -1,7 +1,7 @@
 Fs  = require "fs"
 Log = require "log"
 
-VCR  = require "./../vcr"
+VCR  = require "ys-vcr"
 Path = require "path"
 Package = require Path.join __dirname, "..", "..", "package.json"
 Version = Package.version
@@ -24,8 +24,12 @@ describe "Deploying to heroku", () ->
     production: JSON.parse(Fs.readFileSync("#{fixtureDir}/production.json"))
 
   beforeEach () ->
+    VCR.playback()
     staging    = new HubotDeployGitHubDeployment(buildId, deploymentData.staging)
     production = new HubotDeployGitHubDeployment(buildId, deploymentData.production)
+
+  afterEach () ->
+    VCR.stop()
 
   it "creates builds", (done) ->
     VCR.play "/repos-atmos-my-robot-archive-3c9f42c76-success"
