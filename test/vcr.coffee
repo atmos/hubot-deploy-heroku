@@ -3,7 +3,7 @@ nock = require('nock')
 cassettes = { }
 
 _ = require("underscore")
-filenames = [ "heroku_account", "heroku_app", "heroku_builds", "heroku_statuses", "github_statuses" ]
+filenames = [ "heroku_account", "heroku_app", "heroku_builds", "heroku_statuses", "github_archives", "github_statuses" ]
 (cassettes = _.extend(cassettes, require("./support/cassettes/#{filename}").cassettes) for filename in filenames)
 nock.disableNetConnect()
 
@@ -17,7 +17,7 @@ module.exports.play = (vcrName, times) ->
   if cassette.path
     path = cassette.path
   nock(cassette.host).filteringPath(/\?.*/g, '')[method](path).times(times or 1)
-    .reply(cassette.code, cassette.body)
+    .reply(cassette.code, cassette.body, cassette.headers)
 
 module.exports.stop = ->
   nock.cleanAll()

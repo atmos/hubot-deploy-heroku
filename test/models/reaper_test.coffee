@@ -22,36 +22,36 @@ describe "The Reaper", () ->
   beforeEach () ->
     Nock.disableNetConnect()
     info = new HerokuHelpers.BuildInfo "token", "hubot", buildId
-    status = new GitHubDeploymentStatus "github_token", "atmos/hubot-deploy-heroku", 42
+    status = new GitHubDeploymentStatus "github_token", "atmos/my-robot", 1875476
     status.targetUrl = "https://dashboard.heroku.com/apps/#{appName}/activity/builds/#{buildId}"
 
   it "properly flags repos when a build is succeeded", (done) ->
     VCR.play "/apps-hubot-builds-#{buildId}-succeeded", 2
-    VCR.play "/repos-atmos-hubot-deploy-heroku-deployments-42-statuses-success", 2
+    VCR.play "/repos-atmos-my-robot-deployments-1875476-statuses-success", 2
 
     reaper = new HerokuHelpers.Reaper(info, status, logger)
     reaper.watch (err, res, body, reaper) ->
       responseBody = JSON.parse(body)
       assert.equal "success", reaper.status.state
       assert.equal "Deployment finished successfully.", responseBody.description
-      assert.equal "https://example.com/deployment/42/output", responseBody.target_url
+      assert.equal "https://example.com/deployment/1875476/output", responseBody.target_url
       done()
 
   it "properly flags repos when a build failed", (done) ->
     VCR.play "/apps-hubot-builds-#{buildId}-failed", 2
-    VCR.play "/repos-atmos-hubot-deploy-heroku-deployments-42-statuses-failure", 2
+    VCR.play "/repos-atmos-my-robot-deployments-1875476-statuses-failure", 2
 
     reaper = new HerokuHelpers.Reaper(info, status, logger)
     reaper.watch (err, res, body, reaper) ->
       responseBody = JSON.parse(body)
       assert.equal "failure", reaper.status.state
       assert.equal "Deployment failed to complete.", responseBody.description
-      assert.equal "https://example.com/deployment/42/output", responseBody.target_url
+      assert.equal "https://example.com/deployment/1875476/output", responseBody.target_url
       done()
 
   it "properly flags repos when a build times out", (done) ->
     VCR.play "/apps-hubot-builds-#{buildId}-pending", 5
-    VCR.play "/repos-atmos-hubot-deploy-heroku-deployments-42-statuses-pending", 3
+    VCR.play "/repos-atmos-my-robot-deployments-1875476-statuses-pending", 3
 
     reaper = new HerokuHelpers.Reaper(info, status, logger)
     reaper.maxTries = 2
@@ -59,5 +59,5 @@ describe "The Reaper", () ->
       responseBody = JSON.parse(body)
       assert.equal "failure", reaper.status.state
       assert.equal "Deployment running.", responseBody.description
-      assert.equal "https://example.com/deployment/42/output", responseBody.target_url
+      assert.equal "https://example.com/deployment/1875476/output", responseBody.target_url
       done()

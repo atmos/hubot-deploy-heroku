@@ -1,6 +1,6 @@
 {
   "name": "hubot-deploy-heroku",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "author": "Corey Donohoe <atmos@atmos.org>",
   "description": "Helpers to deploy to heroku with hubot-deploy",
   "main": "index.coffee",
@@ -29,6 +29,7 @@
     }
   ],
   "dependencies": {
+    "octonode": "0.7.4",
     "hubot-vault": "0.0.1",
     "hubot-deploy": "^0.9.10",
     "scoped-http-client": "0.11.0"
