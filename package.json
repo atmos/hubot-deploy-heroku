@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "log": "1.4.0",
-    "vcr": "git+https://github.com/ys/vcr.git",
+    "ys-vcr": "0.3.0",
     "chai": "~1.0.3",
     "nock": "2.16.0",
     "mocha": "~2.3.3",
