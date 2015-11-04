@@ -44,6 +44,7 @@ describe "Deploying to heroku", () ->
     VCR.play "/repos-atmos-my-robot-archive-3c9f42c76-success"
     VCR.play "/apps-hubot-builds-#{buildId}-failure"
     VCR.play "/apps-hubot-pre-authorizations-failure"
+    VCR.play "/repos-atmos-my-robot-deployments-1875476-statuses-failure"
     deployment = new Deployment(production, "h-token", "g-token", logger)
     deployment.yubikey = "ccccccdkhkgtinfvnrrhjveeertdjtdjjilclutikher"
     deployment.run (err, res, body) ->
@@ -56,6 +57,7 @@ describe "Deploying to heroku", () ->
     VCR.play "/repos-atmos-my-robot-archive-3c9f42c76-success"
     VCR.play "/apps-hubot-builds-#{buildId}-failure"
     VCR.play "/apps-hubot-pre-authorizations-success"
+    VCR.play "/repos-atmos-my-robot-deployments-1875476-statuses-failure"
     deployment = new Deployment(production, "h-token", "g-token", logger)
     deployment.yubikey = "ccccccdkhkgtinfvnrrhjveeertdjtdjjilclutikher"
     deployment.run (err, res, body) ->
