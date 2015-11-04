@@ -78,7 +78,10 @@ class Deployment
     ref      = deployment.ref
     repoName = deployment.repoName
 
-    if res?.statusCode is 201
+    if err
+      callback(new Error(err.toString()), res, body, null)
+
+    else if res?.statusCode is 201
       buildId   = data.id
       outputUrl = data.output_stream_url
 
@@ -89,13 +92,10 @@ class Deployment
       reaper = new Helpers.Reaper(info, status, @logger)
       reaper.watch (err, res, body, reaper) ->
         callback(err, res, body, reaper)
-    else if res?.statusCode is 403 and data.id is "two_factor"
-      callback(new Error("Unknown heroku postBuild error."), res, body, null)
     else
       @log JSON.stringify(res.statusCode) if res?
       @log JSON.stringify(body) if body?
-      @log "Error deploying #{@repoName}/#{@version} ##{@number}: #{err}"
-      callback(new Error("Two Factor Failed"), res, body, null)
+      callback(null, res, body, null)
 
   run: (callback) ->
     unless @deployment.notify? and @description and @appName

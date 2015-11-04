@@ -18,7 +18,6 @@ describe "Deploying to heroku", () ->
   buildId    = "01234567-89ab-cdef-0123-456789abcdef"
   staging    = undefined
   production = undefined
-  archiveUrl = "https://example.com/source.tgz?token=xyz"
 
   deploymentData =
     staging:    JSON.parse(Fs.readFileSync("#{fixtureDir}/staging.json"))
@@ -42,19 +41,22 @@ describe "Deploying to heroku", () ->
       done()
 
   it "fails for unknown reasons", (done) ->
+    VCR.play "/repos-atmos-my-robot-archive-3c9f42c76-success"
     VCR.play "/apps-hubot-builds-#{buildId}-failure"
     VCR.play "/apps-hubot-pre-authorizations-failure"
-    deployment = new Deployment(production, "token", archiveUrl, logger)
+    deployment = new Deployment(production, "h-token", "g-token", logger)
     deployment.yubikey = "ccccccdkhkgtinfvnrrhjveeertdjtdjjilclutikher"
     deployment.run (err, res, body) ->
       throw(err) if err
       assert.equal 401, res.statusCode
       done()
 
+
   it "can fail with valid otp", (done) ->
+    VCR.play "/repos-atmos-my-robot-archive-3c9f42c76-success"
     VCR.play "/apps-hubot-builds-#{buildId}-failure"
     VCR.play "/apps-hubot-pre-authorizations-success"
-    deployment = new Deployment(production, "token", archiveUrl, logger)
+    deployment = new Deployment(production, "h-token", "g-token", logger)
     deployment.yubikey = "ccccccdkhkgtinfvnrrhjveeertdjtdjjilclutikher"
     deployment.run (err, res, body) ->
       throw(err) if err
