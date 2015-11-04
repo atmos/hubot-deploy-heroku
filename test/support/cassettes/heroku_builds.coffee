@@ -4,11 +4,12 @@ module.exports.cassettes =
     path: '/apps/hubot/builds'
     code: 401
     method: 'post'
-    body: { }
+    body:
+      message: "Invalid credentials provided."
   '/apps-hubot-builds-01234567-89ab-cdef-0123-456789abcdef-success':
     host: 'https://api.heroku.com:443'
     path: '/apps/hubot/builds'
-    code: 200
+    code: 201
     method: 'post'
     body:
       buildpacks: [ { "url": "https://github.com/heroku/heroku-buildpack-ruby" } ],
@@ -17,7 +18,7 @@ module.exports.cassettes =
       output_stream_url: "https://build-output.heroku.com/streams/01234567-89ab-cdef-0123-456789abcdef",
       source_blob:
         url: "https://example.com/source.tgz?token=xyz",
-        version: "v1.3.0"
+        version: "3c9f42c76"
       slug:
         id: "01234567-89ab-cdef-0123-456789abcdef"
       status: "pending",
