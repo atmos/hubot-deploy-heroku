@@ -3,7 +3,7 @@ Path   = require("path")
 pkg = require Path.join __dirname, "..", "..", "package.json"
 pkgVersion = pkg.version
 
-VCR = require("vcr")
+VCR = require "ys-vcr"
 HubotDeployHeroku = require Path.join __dirname, "..", "..", "src", "helpers"
 
 BuildInfo     = HubotDeployHeroku.BuildInfo

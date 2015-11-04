@@ -4,7 +4,7 @@ Path = require "path"
 pkg = require Path.join __dirname, "..", "..", "package.json"
 pkgVersion = pkg.version
 
-VCR = require "vcr"
+VCR = require "ys-vcr"
 
 HerokuHelpers = require Path.join __dirname, "..", "..", "src", "helpers"
 GitHubDeploymentStatus = require("hubot-deploy/src/models/github_requests").GitHubDeploymentStatus

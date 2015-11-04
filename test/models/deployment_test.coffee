@@ -1,7 +1,7 @@
 Fs  = require "fs"
 Log = require "log"
 
-VCR  = require "vcr"
+VCR  = require "ys-vcr"
 Path = require "path"
 Package = require Path.join __dirname, "..", "..", "package.json"
 Version = Package.version
