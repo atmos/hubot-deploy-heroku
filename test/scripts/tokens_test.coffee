@@ -2,7 +2,7 @@ Path        = require "path"
 Robot       = require "hubot/src/robot"
 TextMessage = require("hubot/src/message").TextMessage
 Helpers     = require("./../../src/helpers")
-VCR         = require "vcr"
+VCR         = require "ys-vcr"
 
 describe "Setting tokens and such", () ->
   user  = null
