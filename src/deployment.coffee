@@ -14,6 +14,8 @@ class Deployment
     @repoName    = @deployment.payload.repository.full_name
     @appName     = @appName()
     @version     = @deployment.payload.deployment.sha[0..8]
+    @githubStatus      = new GitHubDeploymentStatus @githubToken, @repoName, @number
+    @githubStatus.targetUrl = "https://devcenter.heroku.com/articles/platform-api-reference#build-create"
 
   appName: () ->
     deployment  = @deployment.payload.deployment
@@ -78,7 +80,6 @@ class Deployment
     ref      = deployment.ref
     repoName = deployment.repoName
 
-    status = new GitHubDeploymentStatus @githubToken, @repoName, @number
     if err
       callback(new Error(err.toString()), res, body, null)
 
@@ -87,17 +88,17 @@ class Deployment
       outputUrl = data.output_stream_url
 
       info   = new Helpers.BuildInfo @herokuToken, @appName, buildId
-      status.targetUrl = "https://dashboard.heroku.com/apps/#{@appName}/activity/builds/#{buildId}"
+      @githubStatus.targetUrl = "https://dashboard.heroku.com/apps/#{@appName}/activity/builds/#{buildId}"
 
-      reaper = new Helpers.Reaper(info, status, @logger)
+      reaper = new Helpers.Reaper(info, @githubStatus, @logger)
       reaper.watch (err, res, body, reaper) ->
         callback(err, res, body, reaper)
     else
-      status.state = "failure"
-      status.description = data.message
+      @githubStatus.state = "failure"
+      @githubStatus.description = data.message
       originalRes  = res
       originalBody = body
-      status.create (err, res, body) =>
+      @githubStatus.create (err, res, body) =>
         @log JSON.stringify(res.statusCode) if res?
         @log JSON.stringify(body) if body?
         callback(null, originalRes, originalBody, null)
