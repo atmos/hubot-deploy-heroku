@@ -2,15 +2,18 @@ Path         = require "path"
 ScopedClient = require "scoped-http-client"
 
 Helpers                = require Path.join __dirname, "helpers"
+Octonode               = require "octonode"
 Deployment             = Helpers.Deployment
 GitHubDeploymentStatus = require("hubot-deploy/src/models/github_requests").GitHubDeploymentStatus
 
 class Deployment
-  constructor: (@deployment, @token, @archiveUrl, @logger) ->
+  constructor: (@deployment, @herokuToken, @githubToken, @logger) ->
     @description = @deployment.payload.deployment.description.match(/from hubot-deploy/)
+    @number      = @deployment.payload.deployment.id
     @yubikey     = @deployment.yubikey
+    @repoName    = @deployment.payload.repository.full_name
     @appName     = @appName()
-    @version     = @deployment.payload.deployment.sha
+    @version     = @deployment.payload.deployment.sha[0..8]
 
   appName: () ->
     deployment  = @deployment.payload.deployment
@@ -27,13 +30,13 @@ class Deployment
       ScopedClient.create("https://api.heroku.com").
         header("Accept", "application/vnd.heroku+json; version=3").
         header("Content-Type", "application/json").
-        header("Authorization", "Bearer #{@token}").
+        header("Authorization", "Bearer #{@herokuToken}").
         header("Heroku-Two-Factor-Code", "#{@yubikey}")
     else
       ScopedClient.create("https://api.heroku.com").
         header("Accept", "application/vnd.heroku+json; version=3").
         header("Content-Type", "application/json").
-        header("Authorization", "Bearer #{@token}")
+        header("Authorization", "Bearer #{@herokuToken}")
 
   preAuthorize: (callback) ->
     try
@@ -51,13 +54,22 @@ class Deployment
     catch err
       @log "Error pre-authorizing: #{err}"
 
-  build: (callback) ->
-    data = JSON.stringify(source_blob: { url: @archiveUrl, version: @version })
+  archiveUrl: (callback) ->
+    octonode = Octonode.client(@githubToken)
+    octonode.repo(@repoName).archive "tarball", @version, (err, archiveUrl, headers) =>
+      if err
+        @log "Error getting tarball: #{err}"
+      callback(err, archiveUrl, headers)
 
-    @log "Build Payload: #{data}"
-    @httpRequest().path("/apps/#{@appName}/builds").
-      post(data) (err, res, body) =>
-        callback(err, res, body, null)
+  build: (callback) ->
+    @archiveUrl (err, archiveUrl, headers) =>
+      @log err if err
+      data = JSON.stringify(source_blob: { url: archiveUrl, version: @version })
+
+      @log "Build Payload: #{data}"
+      @httpRequest().path("/apps/#{@appName}/builds").
+        post(data) (err, res, body) =>
+          callback(err, res, body, null)
 
   postBuild: (err, res, body, callback) ->
     data        = JSON.parse(body)
@@ -70,19 +82,19 @@ class Deployment
       buildId   = data.id
       outputUrl = data.output_stream_url
 
-      info   = new Helpers.BuildInfo herokuToken, @appName, buildId
-      status = new GitHubDeploymentStatus githubToken, repoName, deployment.number
+      info   = new Helpers.BuildInfo @herokuToken, @appName, buildId
+      status = new GitHubDeploymentStatus @githubToken, @repoName, @number
       status.targetUrl = "https://dashboard.heroku.com/apps/#{@appName}/activity/builds/#{buildId}"
 
-      reaper = new HerokuHelpers.Reaper(info, status, logger)
+      reaper = new Helpers.Reaper(info, status, @logger)
       reaper.watch (err, res, body, reaper) ->
         callback(err, res, body, reaper)
     else if res?.statusCode is 403 and data.id is "two_factor"
       callback(new Error("Unknown heroku postBuild error."), res, body, null)
     else
-      @log JSON.stringify(res.statusCode)
-      @log JSON.stringify(body)
-      @log "Error deploying #{repoName}/#{ref} ##{deployment.number}: #{err}"
+      @log JSON.stringify(res.statusCode) if res?
+      @log JSON.stringify(body) if body?
+      @log "Error deploying #{@repoName}/#{@version} ##{@number}: #{err}"
       callback(new Error("Two Factor Failed"), res, body, null)
 
   run: (callback) ->
@@ -91,11 +103,10 @@ class Deployment
 
     @log "Found heroku chat deployed request for #{@appName}"
     @preAuthorize (err, res, body) =>
-      if err
-        @log err
+      @log err if err
 
       @build (err, res, body) =>
-        @postBuild(err, res, body) (err, res, body, reaper) ->
+        @postBuild err, res, body, (err, res, body, reaper) ->
           callback(err, res, body, reaper)
 
 exports.Deployment = Deployment
