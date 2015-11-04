@@ -8,12 +8,13 @@ GitHubDeploymentStatus = require("hubot-deploy/src/models/github_requests").GitH
 
 class Deployment
   constructor: (@deployment, @herokuToken, @githubToken, @logger) ->
-    @description = @deployment.payload.deployment.description.match(/from hubot-deploy/)
-    @number      = @deployment.payload.deployment.id
-    @yubikey     = @deployment.yubikey
-    @repoName    = @deployment.payload.repository.full_name
-    @appName     = @appName()
-    @version     = @deployment.payload.deployment.sha[0..8]
+    @description  = @deployment.payload.deployment.description.match(/from hubot-deploy/)
+    @number       = @deployment.payload.deployment.id
+    @yubikey      = @deployment.yubikey
+    @repoName     = @deployment.payload.repository.full_name
+    @appName      = @appName()
+    @version      = @deployment.payload.deployment.sha[0..8]
+    @githubStatus = new GitHubDeploymentStatus @githubToken, @repoName, @number
 
   appName: () ->
     deployment  = @deployment.payload.deployment
@@ -86,10 +87,9 @@ class Deployment
       outputUrl = data.output_stream_url
 
       info   = new Helpers.BuildInfo @herokuToken, @appName, buildId
-      status = new GitHubDeploymentStatus @githubToken, @repoName, @number
-      status.targetUrl = "https://dashboard.heroku.com/apps/#{@appName}/activity/builds/#{buildId}"
+      @githubStatus.targetUrl = "https://dashboard.heroku.com/apps/#{@appName}/activity/builds/#{buildId}"
 
-      reaper = new Helpers.Reaper(info, status, @logger)
+      reaper = new Helpers.Reaper(info, @githubStatus, @logger)
       reaper.watch (err, res, body, reaper) ->
         callback(err, res, body, reaper)
     else
