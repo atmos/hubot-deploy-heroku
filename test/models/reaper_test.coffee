@@ -32,6 +32,7 @@ describe "The Reaper", () ->
 
     reaper = new HerokuHelpers.Reaper(info, status, logger)
     reaper.watch (err, res, body, reaper) ->
+      throw err if err
       responseBody = JSON.parse(body)
       assert.equal "success", reaper.status.state
       assert.equal "Deployment finished successfully.", responseBody.description
@@ -44,6 +45,7 @@ describe "The Reaper", () ->
 
     reaper = new HerokuHelpers.Reaper(info, status, logger)
     reaper.watch (err, res, body, reaper) ->
+      throw err if err
       responseBody = JSON.parse(body)
       assert.equal "failure", reaper.status.state
       assert.equal "Deployment failed to complete.", responseBody.description
@@ -57,6 +59,7 @@ describe "The Reaper", () ->
     reaper = new HerokuHelpers.Reaper(info, status, logger)
     reaper.maxTries = 2
     reaper.watch (err, res, body, reaper) ->
+      throw err if err
       responseBody = JSON.parse(body)
       assert.equal "failure", reaper.status.state
       assert.equal "Deployment running.", responseBody.description
