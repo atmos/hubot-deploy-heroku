@@ -41,20 +41,13 @@ class Deployment
         header("Authorization", "Bearer #{@herokuToken}")
 
   preAuthorize: (callback) ->
-    try
-      if @yubikey?
-        @log "Trying to pre-auth /apps/#{@appName}/pre-authorizations"
-        @httpRequest().path("/apps/#{@appName}/pre-authorizations").
-          put() (err, res, body) =>
-            if err
-              callback(err, res, body)
-            if res?.statusCode is 401
-              @log "Probably a 2FA pre-authorization error, ignoring."
-            callback(err, res, body)
-      else
-        callback(null, null, "Skipped API pre-auth, no yubikey provided.")
-    catch err
-      @log "Error pre-authorizing: #{err}"
+    if @yubikey?
+      @log "Trying to pre-auth /apps/#{@appName}/pre-authorizations"
+      @httpRequest().path("/apps/#{@appName}/pre-authorizations").
+        put() (err, res, body) =>
+          callback(err, res, body)
+    else
+      callback(null, null, "Skipped API pre-auth, no yubikey provided.")
 
   archiveUrl: (callback) ->
     octonode = Octonode.client(@githubToken)
