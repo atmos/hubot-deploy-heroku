@@ -58,7 +58,7 @@ describe "Setting tokens and such", () ->
     adapter.receive(new TextMessage(user, "Hubot deploy-token:set:heroku 123456789"))
 
 
-  it "tells you when your stored heroku token is valid", (done) ->
+  it "tells you when your stored heroku token is invalid", (done) ->
     adapter.on "send", (envelope, strings) ->
       assert.match strings[0], /Sorry, your heroku token is invalid\. I removed it from memory/
       done()
