@@ -53,7 +53,7 @@ describe "Setting tokens and such", () ->
     VCR.play "/account valid"
     expectedResponse = /Hey, username@example.com. Your heroku token is valid. I stored it for future use./
     adapter.on "send", (envelope, strings) ->
-      assert robot.vault.forUser(user).get(Helpers.TokenKey), "123456789"
+      assert.equal robot.vault.forUser(user).get(Helpers.TokenKey), "123456789"
       done()
     adapter.receive(new TextMessage(user, "Hubot deploy-token:set:heroku 123456789"))
 
