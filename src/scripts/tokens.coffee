@@ -12,7 +12,7 @@ Crypto  = require "crypto"
 Helpers = require "./../helpers"
 
 module.exports = (robot) ->
-  robot.respond /deploy-token:set:heroku (.*)/i, (msg) ->
+  robot.respond /deploy-token:set:heroku\s+(.*)/i, (msg) ->
     token = msg.match[1]
 
     user  = robot.brain.userForId msg.envelope.user.id
