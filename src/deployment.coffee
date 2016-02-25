@@ -88,6 +88,7 @@ class Deployment
         callback(err, res, body, reaper)
     else
       @githubStatus.state = "failure"
+      console.log data
       @githubStatus.description = data.message
       originalRes  = res
       originalBody = body
