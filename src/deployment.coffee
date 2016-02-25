@@ -88,8 +88,10 @@ class Deployment
         callback(err, res, body, reaper)
     else
       @githubStatus.state = "failure"
-      @log "Failed: #{body}"
-      @githubStatus.description = data.message
+      if data.message?
+        @githubStatus.description = data.message if data.message?
+      else
+        @githubStatus.description = "Something went weird with heroku: #{res.statusCode}"
       originalRes  = res
       originalBody = body
       @githubStatus.create (err, res, body) =>
