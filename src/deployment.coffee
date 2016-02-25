@@ -8,14 +8,14 @@ GitHubDeploymentStatus = require("hubot-deploy/src/models/github_requests").GitH
 
 class Deployment
   constructor: (@deployment, @herokuToken, @githubToken, @logger) ->
-    @description = @deployment.payload.deployment.description.match(/from hubot-deploy/)
-    @number      = @deployment.payload.deployment.id
-    @yubikey     = @deployment.yubikey
-    @repoName    = @deployment.payload.repository.full_name
-    @appName     = @appName()
-    @version     = @deployment.payload.deployment.sha[0..8]
-    @githubStatus      = new GitHubDeploymentStatus @githubToken, @repoName, @number
-    @githubStatus.targetUrl = "https://devcenter.heroku.com/articles/platform-api-reference#build-create"
+    @description  = @deployment.payload.deployment.description.match(/from hubot-deploy/)
+    @number       = @deployment.payload.deployment.id
+    @yubikey      = @deployment.yubikey
+    @repoName     = @deployment.payload.repository.full_name
+    @appName      = @appName()
+    @version      = @deployment.payload.deployment.sha[0..8]
+    @githubStatus = new GitHubDeploymentStatus @githubToken, @repoName, @number
+    @githubStatus.targetUrl = undefined
 
   appName: () ->
     deployment  = @deployment.payload.deployment
