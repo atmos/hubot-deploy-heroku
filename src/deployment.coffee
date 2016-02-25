@@ -74,7 +74,7 @@ class Deployment
     repoName = deployment.repoName
 
     if err
-      callback(new Error(err.toString()), res, body, null)
+      callback(err, res, body, null)
 
     else if res?.statusCode is 201
       buildId   = data.id
