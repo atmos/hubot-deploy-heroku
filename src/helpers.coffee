@@ -33,7 +33,7 @@ class TokenVerifier
 
 class Reaper
   constructor: (@info, @status, @logger) ->
-    @maxTries = 18
+    @maxTries = 45
     @sleepFor = 10
 
   log: (string) ->
