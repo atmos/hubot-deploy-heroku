@@ -65,6 +65,9 @@ class Reaper
                 status.state = "success"
               else
                 status.state = "failure"
+
+            if maxTries is 0
+              status.description = "Build took too long to complete."
             status.create (err, res, body) ->
               callback(err, res, body, self)
           log "Polling Heroku Build: #{info.appName}:#{info.id}:#{status.state}"
